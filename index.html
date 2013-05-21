@@ -20,6 +20,25 @@
         <ul id="todo-list"></ul>
       </section>
 
+
+      <div id="counter">
+      </div>
+
     </div>
+
+    <script type="text/template" id="list-item-template">
+      <span>
+        <input type="checkbox" class="checkbox" <%= complete ? ' checked="checked"' : "" %>>
+        <%= title %>
+      </span>
+    </script>
+
+    <script type="text/template" id="counter-template">
+      <div class="todo-count">
+        <%= completed %> completed.
+        <%= incomplete %> not completed.
+      </div>
+    </script>
+
   </body>
 </html>

@@ -8,9 +8,9 @@ $(document).ready(function(){
     defaults: function() {
       return {
         title: "No title entered",
-        createdAt: new Date,
+        createdAt: new Date(),
         complete: false
-      }
+      };
     },
 
     toggle: function() {
@@ -37,14 +37,12 @@ $(document).ready(function(){
     }
   });
 
-  Todos = new TodoList;
+
+  Todos = new TodoList();
 
   var TodoView = Backbone.View.extend({
     tagName: 'li',
-    template: _.template('<span>' +
-      '<input type="checkbox" class="checkbox"' +
-      '<%= complete ? \' checked="checked"\' : "" %>>' +
-      '<%= title %></span>'),
+    template: _.template($('#list-item-template').html()),
     events: {
       // $('.checkbox').on(click, toggleView);
       "click .checkbox": function() {
@@ -57,25 +55,36 @@ $(document).ready(function(){
     }
   });
 
-var AppView = Backbone.View.extend({
-  el: $('#todoapp'),
-  events: {
-    "click #button": function() {
-      // Todo.create({title => "foo"})
-      Todos.create({title: this.input.val()});
-      this.input.val('');
+  var AppView = Backbone.View.extend({
+    el: $('#todoapp'),
+    events: {
+      "click #button": function() {
+        // Todo.create({title => "foo"})
+        Todos.create({title: this.input.val()});
+        this.input.val('');
+      }
+    },
+    initialize: function() {
+      this.input = this.$('#new-todo');
+      this.counter = this.$('#counter');
+      this.listenTo(Todos, 'add', function(todo) {
+        var view = new TodoView({model: todo});
+        this.$('#todo-list').append(view.render().el);
+      });
+      this.listenTo(Todos, 'all', this.render);
+      Todos.fetch();
+    },
+    counterTemplate: _.template($('#counter-template').html()),
+    render: function() {
+      var completed = Todos.completed().length;
+      var incomplete = Todos.incomplete().length;
+      this.counter.html(this.counterTemplate({
+        completed: completed,
+        incomplete: incomplete
+      }));
     }
-  },
-  initialize: function() {
-    this.input = this.$('#new-todo');
-    this.listenTo(Todos, 'add', function(todo) {
-      var view = new TodoView({model: todo});
-      this.$('#todo-list').append(view.render().el);
-    });
-    Todos.fetch();
-  }
-});
+  });
 
-var App = new AppView;
+  var App = new AppView();
 
 });
