@@ -16,4 +16,25 @@ $(document).ready(function(){
     }
   });
 
+  // collection
+  var TodoList = Backbone.Collection.extend({
+    model: Todo,
+
+    localStorage: new Backbone.LocalStorage('todos'),
+
+    completed: function() {
+      return this.filter(function(todo) {
+        return todo.get('complete') === true;
+      });
+    },
+
+    incomplete: function() {
+      return this.filter(function(todo) {
+        return !todo.get('complete');
+      });
+    }
+  });
+
+  var Todos = new TodoList;
+
 });
