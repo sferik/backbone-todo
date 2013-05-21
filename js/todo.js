@@ -1,3 +1,5 @@
+var Todos;
+
 $(document).ready(function(){
 
   // model
@@ -35,7 +37,7 @@ $(document).ready(function(){
     }
   });
 
-  var Todos = new TodoList;
+  Todos = new TodoList;
 
   var TodoView = Backbone.View.extend({
     tagName: 'li',
@@ -45,10 +47,9 @@ $(document).ready(function(){
       '<%= title %></span>'),
     events: {
       // $('.checkbox').on(click, toggleView);
-      "click .checkbox": "toggleView"
-    },
-    toggleView: function() {
-      this.model.toggle();
+      "click .checkbox": function() {
+        this.model.toggle();
+      }
     },
     render: function() {
       this.$el.html(this.template(this.model.toJSON()));
@@ -59,21 +60,19 @@ $(document).ready(function(){
 var AppView = Backbone.View.extend({
   el: $('#todoapp'),
   events: {
-    "click #button": "addTodo"
+    "click #button": function() {
+      // Todo.create({title => "foo"})
+      Todos.create({title: this.input.val()});
+      this.input.val('');
+    }
   },
   initialize: function() {
     this.input = this.$('#new-todo');
-    this.listenTo(Todos, 'add', this.appendTodo);
+    this.listenTo(Todos, 'add', function(todo) {
+      var view = new TodoView({model: todo});
+      this.$('#todo-list').append(view.render().el);
+    });
     Todos.fetch();
-  },
-  appendTodo: function(todo) {
-    var view = new TodoView({model: todo});
-    this.$('#todo-list').append(view.render().el);
-  },
-  addTodo: function() {
-    // Todo.create({title => "foo"})
-    Todos.create({title: this.input.val()});
-    this.input.val('');
   }
 });
 
